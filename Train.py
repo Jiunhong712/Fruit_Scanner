@@ -33,9 +33,9 @@ EPOCHS = 50
 LEARNING_RATE = 1e-3
 
 # Directory paths
-train_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset3\train" 
-valid_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset3\valid" 
-test_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset3\test" 
+train_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset4\train" 
+valid_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset4\valid" 
+test_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset4\test" 
 
 # Model training
 LOSS = 'sparse_categorical_crossentropy'
@@ -117,59 +117,19 @@ def load_dataset(root_path: str, class_names: list, trim: int = None) -> Tuple[n
     return images, labels
 
 
-# Load the training dataset
+# Load the datasets
 X_train, y_train = load_dataset(root_path=train_dir, class_names=class_names, trim=1000)  # 1000 images per class
-
-# # Load the validation dataset
 X_valid, y_valid = load_dataset(root_path=valid_dir, class_names=class_names)
-
-# Load the testing dataset
 X_test, y_test = load_dataset(root_path=test_dir, class_names=class_names)
 
-
-def show_images(images: np.ndarray, labels: np.ndarray, n_rows: int = 1, n_cols: int = 5, figsize: tuple = (25, 8),
-                model: tf.keras.Model = None) -> None:
-    # Loop over each row of the plot
-    for row in range(n_rows):
-        # Create a new figure for each row
-        plt.figure(figsize=figsize)
-
-        # Generate a random index for each column in the row
-        rand_indices = np.random.choice(len(images), size=n_cols, replace=False)
-
-        # Loop over each column of the plot
-        for col, index in enumerate(rand_indices):
-            # Get the image and label at the random index
-            image = images[index]
-            label = class_names[int(labels[index])]
-
-            # If a model is provided, make a prediction on the image
-            if model:
-                prediction = model.predict(np.expand_dims(tf.squeeze(image), axis=0), verbose=0)[0]
-                conf = np.max(prediction, axis=-1)
-                label += "\nPrediction: {} - {:.4}".format(class_names[np.argmax(prediction)], conf)
-
-            # Plot the image and label
-            plt.subplot(1, n_cols, col + 1)
-            plt.imshow(image)
-            plt.title(label.title())
-            plt.axis("off")
-
-        # Show the row of images
-        plt.show()
-
-
-# Visualize Training Dataset
-# show_images(images=X_train, labels=y_train, n_rows=5)
-
-# Mobilenet Backbone
+# Mobilenet backbone
 print("Loading MobileNet Backbone: ")
 mobilenet = MobileNetV2(input_shape=(IMAGE_SIZE, IMAGE_SIZE, 3), weights='imagenet', include_top=False)
 
 # Freeze the model weights
 mobilenet.trainable = False
 
-# The Mobilenet Model baseline
+# The Mobilenet model baseline
 mobilenet = Sequential([
     mobilenet,
     GlobalAveragePooling2D(),
@@ -177,14 +137,14 @@ mobilenet = Sequential([
     Dense(n_classes, activation='softmax')
 ])
 
-# Compile the Baseline
+# Compile the baseline
 mobilenet.compile(
     loss=LOSS,
     optimizer=Adam(learning_rate=LEARNING_RATE),
     metrics=METRICS
 )
 
-# Train the Xception Baseline Model
+# Train the baseline model
 print("\nTraining Baseline Model: ")
 mobilenet.fit(
     X_train, y_train,
@@ -198,10 +158,10 @@ mobilenet.fit(
 )
 
 # Save the final model
-mobilenet.save('IDP_MobilenetV2_model.h5')
+mobilenet.save(r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\IDP_CNN_MobileNetV2.keras")
 print("Model saved successfully!")
 
-# Testing Evaluation
+# Testing evaluation
 mobilenet_test_loss, mobilenet_test_acc = mobilenet.evaluate(X_test, y_test)
 print(f"\nMobileNet Baseline Testing Loss     : {mobilenet_test_loss}.")
 print(f"MobileNet Baseline Testing Accuracy : {mobilenet_test_acc}.")
@@ -243,7 +203,7 @@ def build_model(hp):
     return model
 
 
-# Initialize Random Searcher
+# Initialize random searcher
 random_searcher = kt.RandomSearch(
     hypermodel=build_model,
     objective='val_loss',
@@ -252,7 +212,7 @@ random_searcher = kt.RandomSearch(
     project_name="MobileNetSearch",
     loss=LOSS)
 
-# Start Searching
+# Start searching
 search = random_searcher.search(
     X_train, y_train,
     validation_data=(X_valid, y_valid),
@@ -283,19 +243,20 @@ mobile_net_model_history = mobile_net_model.fit(
 test_loss, test_acc = mobile_net_model.evaluate(X_test, y_test)
 print("Training Loss    : {:.4} | Baseline : {:.4}".format(test_loss, mobilenet_test_loss))
 print("Training Accuracy: {:.4}% | Baseline : {:.4}%".format(test_acc * 100, mobilenet_test_acc * 100))
+
 # Make predictions
 baseline_pred = np.argmax(mobilenet.predict(X_test, verbose=0), axis=-1)
 best_pred = np.argmax(mobile_net_model.predict(X_test, verbose=0), axis=-1)
 
-# Evaluate prediction : Precision
+# Precision
 baseline_pre = precision_score(y_test, baseline_pred, average='macro')
 best_pre = precision_score(y_test, best_pred, average='macro')
 
-# Evaluate prediction : Recall
+# Recall
 baseline_recall = recall_score(y_test, baseline_pred, average='macro')
 best_recall = recall_score(y_test, best_pred, average='macro')
 
-# Evaluate prediction : F1 Score
+# F1 Score
 baseline_f1 = f1_score(y_test, baseline_pred, average='macro')
 best_f1 = f1_score(y_test, best_pred, average='macro')
 
