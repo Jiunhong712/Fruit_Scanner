@@ -11,9 +11,18 @@ def main():
     print("CUDA Device Name:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "No GPU available")
 
     # Define paths
-    data_config = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset5\data.yaml"  # Dataset YAML file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     save_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B"  # Directory to save model
 
+    # Define dataset path (relative to script location)
+    data_config = os.path.join(script_dir, "dataset", "data.yaml")
+
+    # Check if dataset YAML file exists
+    if not os.path.exists(data_config):
+        raise FileNotFoundError(f"Dataset YAML not found at: {data_config}")
+
+    print(f"Using dataset config: {data_config}")
+    
     # Specify the classes to be used (Modify this list as needed)
     selected_classes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23]
 

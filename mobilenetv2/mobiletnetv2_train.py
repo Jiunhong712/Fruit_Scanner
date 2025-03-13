@@ -32,10 +32,25 @@ BATCH_SIZE = 32
 EPOCHS = 50
 LEARNING_RATE = 1e-3
 
-# Directory paths
-train_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset4\train" 
-valid_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset4\valid" 
-test_dir = r"C:\Users\xavie\OneDrive\Documents\Y4S1\IDP B\Dataset4\test" 
+# Get the script directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Define dataset paths relative to the script
+dataset_dir = os.path.join(script_dir, "dataset")
+
+train_dir = os.path.join(dataset_dir, "train")
+valid_dir = os.path.join(dataset_dir, "valid")
+test_dir = os.path.join(dataset_dir, "test")
+
+# Print paths for debugging
+print(f"Train Directory: {train_dir}")
+print(f"Valid Directory: {valid_dir}")
+print(f"Test Directory: {test_dir}")
+
+# Ensure the directories exist
+for dir_path in [train_dir, valid_dir, test_dir]:
+    if not os.path.exists(dir_path):
+        raise FileNotFoundError(f"Directory not found: {dir_path}")
 
 # Model training
 LOSS = 'sparse_categorical_crossentropy'
