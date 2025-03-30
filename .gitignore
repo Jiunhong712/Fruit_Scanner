@@ -1,0 +1,5 @@
+.conda/
+MobileNetSearch/
+yolov8/dataset/
+mobilenetv2/dataset
+yolov8/hyperparam_trials/*
