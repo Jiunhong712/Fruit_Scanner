@@ -24,7 +24,7 @@ def main():
     print(f"Using dataset config: {data_config}")
     
     # Specify the classes to be used (Modify this list as needed)
-    selected_classes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23]
+    selected_classes = [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15, 21, 22, 23]
 
     # Create YOLO model instance
     model = YOLO("yolov8n.pt")
