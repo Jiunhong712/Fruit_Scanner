@@ -34,7 +34,7 @@ def main():
     print("Starting training...")
     model.train(
         data=data_config,
-        epochs=1,
+        epochs=150,
         imgsz=512,
         device=device,
         patience=5,
