@@ -10,7 +10,7 @@ labels_dir = r'C:\Users\xavie\Downloads\apples\train\labels'
 class_names = ['100-_ripeness', '20-_ripeness', '50-_ripeness', '75-_ripeness', 'rotten_apple']
 
 # Optional: where to save renamed images
-renamed_dir = r'C:\Users\xavie\Downloads\apples\train\renamed_images'
+renamed_dir = r'C:\Users\xavie\Downloads\apples\train\renamed_data'
 os.makedirs(renamed_dir, exist_ok=True)
 
 counter = {cls: 0 for cls in class_names}
